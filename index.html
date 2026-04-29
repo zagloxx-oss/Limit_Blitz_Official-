@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>LIMIT BLITZ | Буст отметок</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Orbitron', monospace;
+            background: #0a0a0a;
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .cyber-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: radial-gradient(ellipse at center, #0a0a2a 0%, #050510 100%);
+        }
+
+        .neon-grid {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(40px, 40px); }
+        }
+
+        .scan-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00ffcc, #00ffcc, transparent);
+            top: 0;
+            animation: scan 6s linear infinite;
+            opacity: 0.5;
+        }
+
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+
+        .particles {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #00ffcc;
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: floatParticle 6s infinite ease-in-out;
+        }
+
+        @keyframes floatParticle {
+            0% { transform: translateY(0) translateX(0); opacity: 0.6; }
+            50% { transform: translateY(-30px) translateX(20px); opacity: 1; }
+            100% { transform: translateY(0) translateX(0); opacity: 0.6; }
+        }
+
+        .floating-lines {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .line {
+            position: absolute;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #00ffcc, #ff00cc, transparent);
+            animation: moveLine 10s linear infinite;
+            opacity: 0.3;
+        }
+
+        .line:nth-child(1) { top: 15%; animation-delay: 0s; }
+        .line:nth-child(2) { top: 30%; animation-delay: 2s; width: 80%; left: 10%; }
+        .line:nth-child(3) { top: 45%; animation-delay: 4s; width: 90%; left: 5%; }
+        .line:nth-child(4) { top: 60%; animation-delay: 6s; width: 70%; left: 15%; }
+        .line:nth-child(5) { top: 75%; animation-delay: 8s; width: 85%; left: 7%; }
+        .line:nth-child(6) { top: 90%; animation-delay: 3s; width: 75%; left: 12%; }
+
+        @keyframes moveLine {
+            0% { transform: translateX(-100%); opacity: 0; }
+            50% { opacity: 0.5; }
+            100% { transform: translateX(100%); opacity: 0; }
+        }
+
+        .floating-circles {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 255, 204, 0.15);
+            animation: pulseCircle 15s infinite ease-in-out;
+        }
+
+        .circle:nth-child(1) { width: 400px; height: 400px; top: -150px; left: -150px; animation-delay: 0s; }
+        .circle:nth-child(2) { width: 600px; height: 600px; bottom: -250px; right: -250px; animation-delay: 3s; }
+        .circle:nth-child(3) { width: 250px; height: 250px; top: 50%; left: 80%; animation-delay: 6s; }
+        .circle:nth-child(4) { width: 350px; height: 350px; top: 70%; left: -100px; animation-delay: 9s; }
+
+        @keyframes pulseCircle {
+            0%, 100% { transform: scale(1); opacity: 0.1; }
+            50% { transform: scale(1.1); opacity: 0.3; }
+        }
+
+        .neon-nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(10, 10, 20, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid #00ffcc;
+            padding: 12px 0;
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.2);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            font-family: 'Orbitron', monospace;
+            background: linear-gradient(45deg, #00ffcc, #ff00cc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(45deg, #00ffcc, #ff00cc);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #0a0a0a;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            background: rgba(0, 255, 204, 0.1);
+            border: 1px solid rgba(0, 255, 204, 0.3);
+            padding: 8px 20px;
+            border-radius: 30px;
+            color: #00ffcc;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background: linear-gradient(45deg, #00ffcc, #ff00cc);
+            color: #0a0a0a;
+            border-color: transparent;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.5);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .page {
+            display: none;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            font-family: 'Orbitron', monospace;
+            background: linear-gradient(45deg, #00ffcc, #ff00cc, #00ffcc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            animation: glitch 3s infinite;
+        }
+
+        @keyframes glitch {
+            0%, 100% { transform: skew(0deg); }
+            95% { transform: skew(0deg); }
+            96% { transform: skew(2deg); }
+            97% { transform: skew(-2deg); }
+            98% { transform: skew(1deg); }
+        }
+
+        .hero p {
+            color: #aaa;
+            margin-top: 10px;
+            letter-spacing: 2px;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(0, 255, 204, 0.1);
+            border: 1px solid #00ffcc;
+            padding: 8px 20px;
+            border-radius: 30px;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .card {
+            background: rgba(10, 10, 20, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(0, 255, 204, 0.2);
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: #00ffcc;
+            box-shadow: 0 0 30px rgba(0, 255, 204, 0.2);
+        }
+
+        .stat {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 8px 12px;
+            border-radius: 12px;
+            margin: 10px 0;
+            color: #ffd966;
+            font-weight: bold;
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            display: inline-block;
+            background: linear-gradient(45deg, #00ffcc, #ff00cc);
+            border: none;
+            padding: 6px 16px;
+            border-radius: 30px;
+            color: #0a0a0a;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            transition: 0.3s;
+            font-size: 0.75rem;
+        }
+
+        .btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.5);
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 30px 0 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(0, 255, 204, 0.3);
+        }
+
+        .section-title i {
+            color: #00ffcc;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            border-top: 1px solid rgba(0, 255, 204, 0.2);
+            margin-top: 40px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .scroll-top-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, #00ffcc, #ff00cc);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.3s;
+            z-index: 99;
+        }
+
+        .scroll-top-btn.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .custom-flag {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #ff00cc, #00ffcc);
+            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: bold;
+            color: #0a0a0a;
+            transition: 0.3s;
+            box-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+        }
+
+        .flag-img {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 48px;
+            height: 48px;
+            border-radius: 4px;
+            box-shadow: 0 0 8px rgba(0, 255, 204, 0.3);
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            display: none;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #0a0a1a;
+            border: 1px solid #00ffcc;
+            border-radius: 20px;
+            padding: 25px;
+            max-width: 350px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .social-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 40px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .social-btn.telegram {
+            background: #0088cc;
+            color: white;
+        }
+
+        .social-btn.vk {
+            background: #4c75a3;
+            color: white;
+        }
+
+        .social-btn.youtube {
+            background: #ff0000;
+            color: white;
+        }
+
+        .social-btn.donate {
+            background: #f5b042;
+            color: #0a0a0a;
+        }
+
+        .project-btn {
+            background: #6c63ff;
+            color: white;
+            text-decoration: none;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 32px; }
+            .nav-container { flex-direction: column; }
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="cyber-bg"><div class="neon-grid"></div><div class="scan-line"></div></div>
+    <div class="particles" id="particlesContainer"></div>
+    <div class="floating-lines"><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div></div>
+    <div class="floating-circles"><div class="circle"></div><div class="circle"></div><div class="circle"></div><div class="circle"></div></div>
+
+    <nav class="neon-nav">
+        <div class="nav-container">
+            <div class="logo"><div class="logo-icon">⚡</div><span>LIMIT BLITZ</span></div>
+            <div class="nav-links">
+                <button class="nav-btn active" data-page="main"><i class="fas fa-home"></i> Главная</button>
+                <button class="nav-btn" data-page="tanks"><i class="fas fa-tank"></i> Танки</button>
+                <button class="nav-btn" data-page="boost"><i class="fas fa-chart-line"></i> Буст отметок</button>
+                <button class="nav-btn" data-page="media"><i class="fas fa-video"></i> Медиа и поддержка</button>
+                <button class="nav-btn" data-page="projects"><i class="fas fa-folder"></i> Мои проекты</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- ГЛАВНАЯ СТРАНИЦА -->
+        <div id="mainPage" class="page active">
+            <div class="hero">
+                <h1>LIMIT BLITZ</h1>
+                <p>танковая арена | ребаланс 2026 | кибер-тактика</p>
+                <div class="hero-badge"><i class="fas fa-bolt"></i> Добро пожаловать в киберпространство!</div>
+            </div>
+
+            <div class="section-title">
+                <i class="fas fa-trophy"></i>
+                <h2>КЛАНОВЫЕ АКТИВНОСТИ [YLBC]</h2>
+            </div>
+            <div class="grid">
+                <div class="card">
+                    <h3>🏆 ТЕКУЩЕЕ МЕСТО В КБЗ</h3>
+                    <div class="stat">⭐ 1 МЕСТО: <strong>СКОРО</strong></div>
+                    <div class="stat">⭐ 2 МЕСТО: <strong>СКОРО</strong></div>
+                    <div class="stat">⭐ 3 МЕСТО: <strong>СКОРО</strong></div>
+                    <div class="stat" style="background: linear-gradient(45deg, #ff00cc, #00ffcc); color: #0a0a0a; margin-top: 15px;">
+                        ⏳ ДО ОКОНЧАНИЯ НЕДЕЛИ:
+                    </div>
+                    <div class="stat" id="timerDisplay" style="font-size: 1.2rem; text-align: center;">Загрузка...</div>
+                    <a href="#" id="openClanModalBtn" class="btn">Награды →</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- СТРАНИЦА ТАНКИ (ПОЛНЫЙ СПИСОК РЕБАЛАНСА) -->
+        <div id="tanksPage" class="page">
+            <div class="section-title"><i class="fas fa-tank"></i><h2>Танки после ребаланса</h2></div>
+            <div class="grid">
+                <!-- Чехия -->
+                <div class="card"><img src="https://flagicons.lipis.dev/flags/1x1/cz.svg" class="flag-img" alt="Чехия"><h3>TVP T 50/51 (X) — Чехия</h3><div class="stat">🎯 Сведение: 3.3→4.0 с</div><div class="stat">🔄 Перезарядка магазина: 21.09→22.05 с</div><div class="stat">⏱️ Перезарядка в магазине: 1.0→1.33 с</div></div>
+                
+                <!-- Франция -->
+                <div class="card"><img src="https://flagicons.lipis.dev/flags/1x1/fr.svg" class="flag-img" alt="Франция"><h3>Projet Murat (X)</h3><div class="stat">🔄 Перезарядка: 6.81→8.63 с</div><div class="stat">💥 Урон КС: 330→340 ед.</div></div>
+                
+                <!-- Германия -->
+                <div class="card"><img src="https://flagicons.lipis.dev/flags/1x1/de.svg" class="flag-img" alt="Германия"><h3>Erich Konzept I (IX)</h3><div class="stat">🎯 Бронепробиваемость: 230 → 240 мм</div></div>
+                <div class="card"><img src="https://flagicons.lipis.dev/flags/1x1/de.svg" class="flag-img" alt="Германия"><h3>Erich Konzept I (X)</h3><div class="stat">🎯 Бронепробиваемость: 230→240 мм</div></div>
+                <div class="card"><img src="https://flagicons.lipis.dev/flags/1x1/de.svg" class="flag-img" alt="Германия"><h3>Rhm.-Borsig Waffenträger (VIII)</h3><div class="stat">🔄 Перезарядка (12,8 cm): 13.42→11.51 с</div><div class="stat">📏 Разброс (15 cm): 0.422→0.384 м</div></div>
+                
+                <!-- Великобритания -->
+                <div class="card"><img src="https://flagicons.lipis.dev/flags/1x1/gb.svg" class="flag-img" alt="Великобритания"><h3>Churchill I (V)</h3><div class="stat">🛡️ Корма корпуса: 53 → 54 мм</div></div>
+                <div class="card"><img src="https://flagicons.lipis.dev/flags/1x1/gb.svg" class="flag-img" alt="Великобритания"><h3>Churchill VII (VI)</h3><div class="stat">🛡️ Сток. башня: 89/76/76 → 127/90/90 мм</div><div class="stat">🛡️ Топ. башня: 152/95/95 → 160/96/96 мм</div></div>
+                <div class="card"><img src="https://flagicons.lipis.dev/flags/1x1/gb.svg" class="flag-img" alt="Великобритания"><h3>Black Prince (VII)</h3><div class="stat">🛡️ Башня: 152/95/95 → 160/96/96 мм</div><div class="stat">🛡️ Корпус: 180/95/25 → 180/96/26 мм</div></div>
+                <div class="card"><img src="https://flagicons.lipis.dev/flags/1x1/gb.svg" class="flag-img" alt="Великобритания"><h3>Caernarvon (VIII)</h3><div class="stat">🛡️ Топ. башня: 165/112 → 250/120</div><div class="stat">🛡️ Сток. башня: 152/95/95 → 160/96/96 мм</div><div class="stat">🛡️ Лоб корпуса: 135 → 136 мм</div></div>
+                <div class="card"><img src="https://flagicons.lipis.dev/flags/1x1/gb.svg" class="flag-img" alt="Великобритания"><h3>Conqueror (IX)</h3><div class="stat">🛡️ Сток. башня: 165/112 → 250/120</div><div class="stat">🛡️ Борт топ. башни: 106 → 112 мм</div><div class="stat">🛡️ Борт корпуса: 53 → 80 мм</div></div>
+                <div class="card"><img src="https://flagicons.lipis.dev/flags/1x1/gb.svg" class="flag-img" alt="Великобритания"><h3>FV215b (X)</h3><div class="stat">🛡️ Башня: 264/122/72 → 270/130/90 мм</div><div class="stat">🛡️ Корма корпуса: 68 → 90 мм</div></div>
+                <div class="card"><img src="https://flagicons.lipis.dev/flags/1x1/gb.svg" class="flag-img" alt="Великобритания"><h3>Caliban (VIII)</h3><div class="stat">📏 Разброс: 0.470→0.440 м | Сведение: 7.1→6.4 с</div><div class="stat">🎯 Бронепробиваемость: 218→221 мм</div></div>
+                <div class="card"><img src="https://flagicons.lipis.dev/flags/1x1/gb.svg" class="flag-img" alt="Великобритания"><h3>Centurion Mk. 5/1 RAAC (VIII)</h3><div class="stat">🔄 Орудие стало барабанным на 2 снаряда</div><div class="stat">⏱️ Перезарядка между выстрелами: 1.0 с | Дозарядка: 5.75 с</div></div>
+                
+                <!-- США -->
+                <div class="card"><img src="https://flagicons.lipis.dev/flags/1x1/us.svg" class="flag-img" alt="США"><h3>Chieftain/T95 (VIII)</h3><div class="stat">🛡️ Борт топ. башни: 89 → 120 мм</div><div class="stat">📏 Уменьшен размер ком. башенки</div></div>
+                <div class="card"><img src="https://flagicons.lipis.dev/flags/1x1/us.svg" class="flag-img" alt="США"><h3>T95E2 (VIII)</h3><div class="stat">⚡ Мощность: 680→750 л.с.</div></div>
+                <div class="card"><img src="https://flagicons.lipis.dev/flags/1x1/us.svg" class="flag-img" alt="США"><h3>T26E4 SuperPershing (VIII)</h3><div class="stat">💥 Урон: 225→240 ед. | Перезарядка: 6.90→5.75 с</div><div class="stat">📏 Разброс: 0.364→0.345 м</div></div>
+                
+                <!-- Китай -->
+                <div class="card"><img src="https://flagicons.lipis.dev/flags/1x1/cn.svg" class="flag-img" alt="Китай"><h3>WZ-111-1G FT (VIII)</h3><div class="stat">💪 Прочность: 1100→1300 ед.</div><div class="stat">🛡️ Лоб рубки: 190→200 мм</div></div>
+                <div class="card"><img src="https://flagicons.lipis.dev/flags/1x1/cn.svg" class="flag-img" alt="Китай"><h3>WZ-113-II (VIII)</h3><div class="stat">🛡️ Лоб башни: 220→250 мм | Лоб корпуса: 110→120 мм</div><div class="stat">🛡️ Крыша башни: 70→75 мм | Ком. башенка: 70→120 мм</div><div class="stat">➕ Калибровка прицела</div></div>
+                <div class="card"><img src="https://flagicons.lipis.dev/flags/1x1/cn.svg" class="flag-img" alt="Китай"><h3>112 Ледяной (VIII)</h3><div class="stat">🎯 Бронепробиваемость БП: 215→221 мм</div><div class="stat">🔄 Перезарядка: 13.42→11.98 с</div></div>
+                <div class="card"><img src="https://flagicons.lipis.dev/flags/1x1/cn.svg" class="flag-img" alt="Китай"><h3>WZ-112-2 (VIII)</h3><div class="stat">🎯 Бронепробиваемость БП: 215→221 мм</div></div>
+                <div class="card"><img src="https://flagicons.lipis.dev/flags/1x1/cn.svg" class="flag-img" alt="Китай"><h3>WZ-111 (VIII)</h3><div class="stat">🎯 Бронепробиваемость БП: 215→221 мм</div></div>
+                
+                <!-- Польша -->
+                <div class="card"><img src="https://flagicons.lipis.dev/flags/1x1/pl.svg" class="flag-img" alt="Польша"><h3>Wz.70 (X)</h3><div class="stat">⏱️ Штраф за неполное остывание ослаблен на 63%</div></div>
+                
+                <!-- Сборная нации (кастомный флаг) -->
+                <div class="card"><div class="custom-flag">L</div><h3>T 55A (IX) — Сборная нации</h3><div class="stat">🛡️ Лоб башни: 210→230 мм | Ком. башенка: 130→230 мм</div><div class="stat">⚡ Мощность: 700→780 л.с.</div><div class="stat">🔄 Перезарядка: 7.19→6.71 с | Урон: 310→330 ед.</div></div>
+                <div class="card"><div class="custom-flag">L</div><h3>МБ-56 Амадей (VIII) — Сборная нации</h3><div class="stat">🛡️ Лоб башни: 175→200 мм | Маска орудия: 200→245 мм</div><div class="stat">🔄 Перезарядка: 13.71→11.75 с</div></div>
+                <div class="card"><div class="custom-flag">L</div><h3>МБ-73 Коперник (VIII) — Сборная нации</h3><div class="stat">🛡️ Лоб башни: 165→220 мм | Маска орудия: 165→245 мм</div><div class="stat">🔄 Перезарядка магазина: 13.71→11.75 с</div></div>
+                <div class="card"><div class="custom-flag">L</div><h3>МБ-35 Кулибин (IX) — Сборная нации</h3><div class="stat">🛡️ Лоб башни (сток): 180→220 мм</div><div class="stat">🔄 Перезарядка магазина: 13.71→12.73 с (топ: 11.75→10.77 с)</div><div class="stat">🛡️ Ком. башенка: 180→235 мм</div></div>
+                <div class="card"><div class="custom-flag">L</div><h3>Wz.70 (X) — Сборная нации</h3><div class="stat">⏱️ Штраф за неполное остывание ослаблен на 63%</div></div>
+                
+                <!-- СССР -->
+                <div class="card"><img src="https://upload.wikimedia.org/wikipedia/commons/9/9b/Flag_of_the_Soviet_Union.svg" class="flag-img" alt="СССР"><h3>ИСУ-152 (VIII)</h3><div class="stat">📏 Разброс: 0.460→0.412 м | Перезарядка: 14.63→13.90 с</div><div class="stat">🎯 Сведение: 5.8→4.9 с (сток), 5.6→4.8 с (топ)</div></div>
+                <div class="card"><img src="https://upload.wikimedia.org/wikipedia/commons/9/9b/Flag_of_the_Soviet_Union.svg" class="flag-img" alt="СССР"><h3>Объект 704 (IX)</h3><div class="stat">📏 Разброс: 0.441→0.412 м | Перезарядка: 14.63→13.90 с</div><div class="stat">🎯 Сведение: 5.8→5.3 с (сток), 5.6→5.2 с (топ)</div></div>
+                <div class="card"><img src="https://upload.wikimedia.org/wikipedia/commons/9/9b/Flag_of_the_Soviet_Union.svg" class="flag-img" alt="СССР"><h3>КВ-4 Турчанинова (VIII)</h3><div class="stat">🎯 Бронепробиваемость: 227/289→221/260 мм</div><div class="stat">📏 Разброс: 0.364→0.393 м | 🛡️ Борт корпуса: 150→120 мм</div></div>
+                <div class="card"><img src="https://upload.wikimedia.org/wikipedia/commons/9/9b/Flag_of_the_Soviet_Union.svg" class="flag-img" alt="СССР"><h3>Объект 263 (X)</h3><div class="stat">🛡️ Бронирование ковша: 20→200 мм</div></div>
+                <div class="card"><img src="https://upload.wikimedia.org/wikipedia/commons/9/9b/Flag_of_the_Soviet_Union.svg" class="flag-img" alt="СССР"><h3>Объект 260 (X)</h3><div class="stat">🛡️ Исправлены ошибки бронирования щеки башни</div></div>
+                <div class="card"><img src="https://upload.wikimedia.org/wikipedia/commons/9/9b/Flag_of_the_Soviet_Union.svg" class="flag-img" alt="СССР"><h3>СТ-II (X)</h3><div class="stat">📏 Разброс: 0.384→0.364 м | Перезарядка: 22.05→21.09 с</div><div class="stat">🛡️ Щеки башни: 91→140 мм | Крыша башни: 50→70 мм</div></div>
+                <div class="card"><img src="https://upload.wikimedia.org/wikipedia/commons/9/9b/Flag_of_the_Soviet_Union.svg" class="flag-img" alt="СССР"><h3>ИС-2-II (VIII)</h3><div class="stat">📏 Разброс: 0.355→0.345 м | Перезарядка: 17.26→16.30 с</div></div>
+            </div>
+        </div>
+
+        <!-- БУСТ ОТМЕТОК -->
+        <div id="boostPage" class="page">
+            <div class="section-title">
+                <i class="fas fa-chart-line"></i>
+                <h2>БУСТ ОТМЕТОК</h2>
+            </div>
+            <div class="hero-badge" style="margin-bottom: 20px;">
+                Я вместо вас беру отметки мастерства за символическую плату, обговариваем все детали лично с вами
+            </div>
+            <div class="grid">
+                <div class="card">
+                    <h3>VII УРОВЕНЬ</h3>
+                    <div class="stat">1 отметка — 75₽ <button class="btn buy-btn" data-product="VII уровень, 1 отметка, 75₽">Купить</button></div>
+                    <div class="stat">2 отметки — 150₽ <button class="btn buy-btn" data-product="VII уровень, 2 отметки, 150₽">Купить</button></div>
+                    <div class="stat">3 отметки — 250₽ <button class="btn buy-btn" data-product="VII уровень, 3 отметки, 250₽">Купить</button></div>
+                </div>
+                <div class="card">
+                    <h3>VIII УРОВЕНЬ</h3>
+                    <div class="stat">1 отметка — 150₽ <button class="btn buy-btn" data-product="VIII уровень, 1 отметка, 150₽">Купить</button></div>
+                    <div class="stat">2 отметки — 350₽ <button class="btn buy-btn" data-product="VIII уровень, 2 отметки, 350₽">Купить</button></div>
+                    <div class="stat">3 отметки — СКОРО</div>
+                </div>
+                <div class="card">
+                    <h3>X УРОВЕНЬ</h3>
+                    <div class="stat">1 отметка — СКОРО</div>
+                    <div class="stat">2 отметки — СКОРО</div>
+                    <div class="stat">3 отметки — СКОРО</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- МЕДИА И ПОДДЕРЖКА -->
+        <div id="mediaPage" class="page">
+            <div class="section-title"><i class="fas fa-video"></i><h2>Медиа и поддержка</h2></div>
+            <div class="grid">
+                <div class="card"><h3>🎬 YouTube</h3><p>Смотри обзоры, гайды и стримы</p><a href="http://www.youtube.com/@Limit_Blitz_Official" target="_blank" class="btn social-btn youtube">Перейти →</a></div>
+                <div class="card"><h3>📱 VK</h3><p>Мой личный профиль</p><a href="https://vk.com/vip_kotik_1" target="_blank" class="btn social-btn vk">Перейти →</a></div>
+                <div class="card"><h3>📱 Telegram</h3><p>Связь со мной</p><a href="https://t.me/l_AWANGARD_l" target="_blank" class="btn social-btn telegram">Перейти →</a></div>
+                <div class="card"><h3>💰 Поддержать</h3><p>DonationAlerts</p><a href="https://www.donationalerts.com/r/limitblitzoffical" target="_blank" class="btn social-btn donate">Поддержать →</a></div>
+            </div>
+        </div>
+
+        <!-- МОИ ПРОЕКТЫ -->
+        <div id="projectsPage" class="page">
+            <div class="section-title"><i class="fas fa-folder"></i><h2>Мои проекты</h2></div>
+            <div class="grid">
+                <div class="card"><h3>🛒 AWANGARD STORE</h3><p>Магазин игровых товаров</p><a href="https://zagloxx-oss.github.io/AWANGARD/" target="_blank" class="btn project-btn">Перейти →</a></div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>LIMIT BLITZ — портал по танкам | Данные ребаланса 2026 | © 2026</p>
+    </footer>
+
+    <div class="scroll-top-btn" id="scrollTopBtn"><i class="fas fa-arrow-up"></i></div>
+
+    <!-- Модальное окно для наград -->
+    <div id="clanModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>[YLBC] НАГРАДЫ</h3>
+                <button class="close-modal" id="closeModalBtn">&times;</button>
+            </div>
+            <div class="reward-item">
+                <div class="reward-place">🥇 1 МЕСТО</div>
+                <div>▸ Зам. командира<br>▸ 3 бонус-кода на контейнер только с золотом (250-10000)</div>
+            </div>
+            <div class="reward-item">
+                <div class="reward-place">🥈 2 МЕСТО</div>
+                <div>▸ 2 бонус-кода на контейнеры только с золотом 250-10000</div>
+            </div>
+            <div class="reward-item">
+                <div class="reward-place">🥉 3 МЕСТО</div>
+                <div>▸ 1 бонус-код на контейнер только с золотом 250-10000</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно выбора соцсети -->
+    <div id="socialModal" class="modal">
+        <div class="modal-content">
+            <h3>Выберите способ связи</h3>
+            <div class="modal-buttons">
+                <a href="https://t.me/l_AWANGARD_l" target="_blank" class="social-btn telegram"><i class="fab fa-telegram"></i> Telegram</a>
+                <a href="https://vk.com/vip_kotik_1" target="_blank" class="social-btn vk"><i class="fab fa-vk"></i> ВКонтакте</a>
+            </div>
+            <button id="closeSocialModal" class="btn" style="margin-top: 20px; background: #333; text-align: center;">Закрыть</button>
+        </div>
+    </div>
+
+    <script>
+        function createParticles() {
+            const container = document.getElementById('particlesContainer');
+            if (!container) return;
+            for (let i = 0; i < 80; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.width = (Math.random() * 4 + 1) + 'px';
+                particle.style.height = particle.style.width;
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 8 + 's';
+                particle.style.animationDuration = 3 + Math.random() * 5 + 's';
+                container.appendChild(particle);
+            }
+        }
+
+        function initNavigation() {
+            const btns = document.querySelectorAll('.nav-btn');
+            const pages = document.querySelectorAll('.page');
+            btns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const pageId = btn.dataset.page + 'Page';
+                    btns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    pages.forEach(page => page.classList.remove('active'));
+                    const activePage = document.getElementById(pageId);
+                    if (activePage) activePage.classList.add('active');
+                });
+            });
+        }
+
+        const scrollTopBtn = document.getElementById('scrollTopBtn');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) scrollTopBtn.classList.add('show');
+            else scrollTopBtn.classList.remove('show');
+        });
+        scrollTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        // Таймер
+        function getNextMonday12() {
+            const now = new Date();
+            const nextMonday = new Date(now);
+            nextMonday.setDate(now.getDate() + ((1 + 7 - now.getDay()) % 7 || 7));
+            nextMonday.setHours(12, 0, 0, 0);
+            if (now.getDay() === 1 && now.getHours() >= 12) {
+                nextMonday.setDate(nextMonday.getDate() + 7);
+            }
+            return nextMonday;
+        }
+
+        function updateTimer() {
+            const target = getNextMonday12();
+            const now = new Date();
+            const diff = target - now;
+            if (diff <= 0) {
+                document.getElementById('timerDisplay').innerHTML = "НЕДЕЛЯ ЗАВЕРШЕНА";
+                return;
+            }
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (86400000)) / (3600000));
+            const minutes = Math.floor((diff % 3600000) / 60000);
+            const seconds = Math.floor((diff % 60000) / 1000);
+            document.getElementById('timerDisplay').innerHTML = `${days}д ${hours}ч ${minutes}м ${seconds}с`;
+        }
+
+        setInterval(updateTimer, 1000);
+        updateTimer();
+
+        // Модалка наград
+        const clanModal = document.getElementById('clanModal');
+        const openClanBtn = document.getElementById('openClanModalBtn');
+        const closeClanBtn = document.getElementById('closeModalBtn');
+        if (openClanBtn) openClanBtn.onclick = (e) => { e.preventDefault(); clanModal.classList.add('active'); };
+        if (closeClanBtn) closeClanBtn.onclick = () => clanModal.classList.remove('active');
+
+        // Модалка выбора соцсети для покупки
+        const socialModal = document.getElementById('socialModal');
+        const closeSocialBtn = document.getElementById('closeSocialModal');
+        let currentProduct = '';
+
+        document.querySelectorAll('.buy-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                currentProduct = btn.getAttribute('data-product');
+                socialModal.classList.add('active');
+            });
+        });
+
+        if (closeSocialBtn) closeSocialBtn.onclick = () => socialModal.classList.remove('active');
+
+        window.onclick = (e) => {
+            if (e.target === clanModal) clanModal.classList.remove('active');
+            if (e.target === socialModal) socialModal.classList.remove('active');
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            createParticles();
+            initNavigation();
+        });
+    </script>
+</body>
+</html>
